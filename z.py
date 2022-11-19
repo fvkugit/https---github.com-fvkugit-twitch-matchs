@@ -28,7 +28,6 @@ class Bot(commands.Bot):
             teamIds = []
             print("-")
             self.matchesCount += 1
-            print(self.matchesCount)
             for i in range(len(teams['teams'])):
                 # print(teams['teams'][i]['activeChallengesCount'], teams['teams'][i]['name'], teams['teams'][i]['id'])
                 currentTeam = teams['teams'][i]['id']
