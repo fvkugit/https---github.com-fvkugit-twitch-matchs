@@ -7,7 +7,7 @@ class Bot(commands.Bot):
 
     def __init__(self):
         self.partidas = []
-        super().__init__(token=os.environ.get('TOKEN'), prefix='?', initial_channels=['fhakk'])
+        super().__init__(token=os.environ.get('TOKEN'), prefix='?', initial_channels=[os.environ.get('CHANNEL')])
 
     def api_get(self, url):
         try:            
