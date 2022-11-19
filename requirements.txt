@@ -1,4 +1,2 @@
 twitchio
 requests
-json
-os
