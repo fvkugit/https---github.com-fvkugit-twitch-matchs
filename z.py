@@ -27,6 +27,8 @@ class Bot(commands.Bot):
             if (not teams): return;
             teamIds = []
             print("-")
+            self.matchesCount += 1
+            print(self.matchesCount)
             for i in range(len(teams['teams'])):
                 # print(teams['teams'][i]['activeChallengesCount'], teams['teams'][i]['name'], teams['teams'][i]['id'])
                 currentTeam = teams['teams'][i]['id']
@@ -43,8 +45,6 @@ class Bot(commands.Bot):
                         mode = teams['teams'][i]["isSingleType"] and "1v1" or "2v2"
                         self.partidas.append(matchId)
                         print(f"Partida #{matchId} contra {match['opponent_team_name']}")
-                        self.matchesCount += 1
-                        print(self.matchesCount)
                         if self.matchesCount == 1: continue;
                         await self.mainChannel.send(f"Nueva partida {mode} contra {match['opponent_team_name']} [ID #{matchId}]")
         partidas.start(self)
