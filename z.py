@@ -8,7 +8,7 @@ class Bot(commands.Bot):
     def __init__(self):
         self.partidas = []
         super().__init__(token=os.environ.get('TOKEN'), prefix='?', initial_channels=[os.environ.get('CHANNEL')])
-
+        
     def api_get(self, url):
         try:            
             response_API = requests.get(url)
@@ -33,7 +33,7 @@ class Bot(commands.Bot):
                 currentTeam = teams['teams'][i]['id']
                 teamIds.append(currentTeam)
                 matchs = self.api_get(f'https://www.checkmategaming.com/api/core/team/{currentTeam}/match-list?team_id={currentTeam}&offset=0&limit=3')
-                if (not matchs or not matchs['data'] or not matchs['data']['ladders']): continue;
+                if (not matchs or not 'data' in matchs or not 'ladders' in matchs['data'] or matchs['data']['ladders'] == None): continue;
                 scheduled = len(matchs['data']['ladders'][0]['matches'])>1
                 # print(f"Partidas en curso: {len(matchs['data']['ladders'][0]['matches']['scheduled']) if scheduled else 0}")
                 if scheduled: 
