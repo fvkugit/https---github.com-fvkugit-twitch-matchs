@@ -75,10 +75,11 @@ class Bot(commands.Bot):
                         if ((matchId in self.partidas) or match['match_status'] != "Scheduled"): continue; # Continue if match was already announced or status isnt Scheduled
                         mode = teams['teams'][i]["isSingleType"] and "1v1" or "2v2" # Get match mode
                         self.partidas.append(matchId)
-                        # if self.matchesCount == 1: continue; # Not announce match on first iteration
+                        print("» New match «")
+                        if self.matchesCount == 1: continue; # Not announce match on first iteration
                         matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
-                        print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                        await self.mainChannel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                        print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                        await self.mainChannel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
 
 bot = Bot()
