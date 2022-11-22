@@ -3,6 +3,8 @@ import requests
 import json
 import os
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+load_dotenv()
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -15,7 +17,8 @@ class Bot(commands.Bot):
             toText = response_API.text
             parsed = json.loads(toText)
             return parsed
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def api_get_text(self, url):
@@ -23,7 +26,8 @@ class Bot(commands.Bot):
             response_API = requests.get(url)
             toText = response_API.text
             return toText
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def getMatchData(self, url):
@@ -42,7 +46,7 @@ class Bot(commands.Bot):
     async def event_ready(self):
         self.mainChannel = self.connected_channels[0]
         self.matchesCount = 0
-        @routines.routine(seconds=os.environ.get('TIMER'))
+        @routines.routine(seconds=int(os.environ.get('TIMER')))
         async def partidas(self):
             print("» Waiting «")
 
@@ -61,20 +65,20 @@ class Bot(commands.Bot):
                 
                 # Check if have scheduled matchs on response
                 scheduled = 'scheduled' in matchs['data']['ladders'][0]['matches']
-
+        
                 # Handle data of scheduled match
                 if scheduled: 
                     for j in range(len((matchs['data']['ladders'][0]['matches']['scheduled']))):
                         # Get match data
                         match = (matchs['data']['ladders'][0]['matches']['scheduled'][j])
                         matchId = match['id']
-                        if (matchId in self.partidas): continue; # Continue if match was already announced
+                        if ((matchId in self.partidas) or match['match_status'] != "Scheduled"): continue; # Continue if match was already announced or status isnt Scheduled
                         mode = teams['teams'][i]["isSingleType"] and "1v1" or "2v2" # Get match mode
                         self.partidas.append(matchId)
-                        if self.matchesCount == 1: continue; # Not announce match on first iteration
+                        # if self.matchesCount == 1: continue; # Not announce match on first iteration
                         matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
-                        print(f"Nueva partida {mode} BO{matchData['bo']} contra {match['opponent_team_name']} por {matchData['pot']} [ID #{matchId}]")
-                        await self.mainChannel.send(f"Nueva partida {mode} BO{matchData['bo']} contra {match['opponent_team_name']} por {matchData['pot']} [ID #{matchId}]")
+                        print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                        await self.mainChannel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
 
 bot = Bot()
