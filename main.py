@@ -18,7 +18,7 @@ class Bot(commands.Bot):
             parsed = json.loads(toText)
             return parsed
         except Exception as e:
-            print(e)
+            print("ERROR", e)
             return False
 
     def api_get_text(self, url):
@@ -27,7 +27,7 @@ class Bot(commands.Bot):
             toText = response_API.text
             return toText
         except Exception as e:
-            print(e)
+            print("ERROR", e)
             return False
 
     def getMatchData(self, url):
