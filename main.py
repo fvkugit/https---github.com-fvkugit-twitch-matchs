@@ -4,8 +4,8 @@ import json
 import os
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from log import *
 load_dotenv()
-
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -25,7 +25,7 @@ class Bot(commands.Bot):
             parsed = json.loads(toText)
             return parsed
         except Exception as e:
-            print("ERROR", e)
+            writeOnFile("log.txt", e)
             return False
 
     def api_get_text(self, url):
@@ -34,7 +34,7 @@ class Bot(commands.Bot):
             toText = response_API.text
             return toText
         except Exception as e:
-            print("ERROR", e)
+            writeOnFile("log.txt", e)
             return False
 
     def getMatchData(self, url):
@@ -66,7 +66,7 @@ class Bot(commands.Bot):
             else:
                 return data['data'][0]['type'] == "live"
         except Exception as e:
-            print("ERROR", e)
+            writeOnFile("log.txt", e)
             return False
 
 
@@ -113,6 +113,7 @@ class Bot(commands.Bot):
                             channel = self.connected_channels[channelIndex]
                             print(f"Channel: {channel.name}")
                             print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            writeOnFile("log.txt", f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
                             await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
 
