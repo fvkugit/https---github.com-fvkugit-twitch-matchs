@@ -44,6 +44,24 @@ class Bot(commands.Bot):
         matchData['bo'] = title.split()[-1]
         return matchData
 
+    def isChannelLive(self, channel):
+        try:
+            url = "https://api.twitch.tv/helix/streams"
+            querystring = {"user_login":channel}
+            headers = {
+                "Client-ID": os.environ.get('CLIENT'),
+                "Authorization": "Bearer " + os.environ.get('TOKEN')
+            }
+            response = requests.request("GET", url, headers=headers, params=querystring)
+            data = response.json()
+            if (len(data['data']) == 0):
+                return False
+            else:
+                return data['data'][0]['type'] == "live"
+        except Exception as e:
+            print("ERROR", e)
+            return False
+
 
     async def event_ready(self):
         self.mainChannel = self.connected_channels[0]
@@ -53,6 +71,11 @@ class Bot(commands.Bot):
             print("» Waiting «")
             self.matchesCount += 1 # Counter to prevent announce already started matchs before bot is ready
             for channelIndex, uuid in enumerate(self._uuidList):
+                channel = self.connected_channels[channelIndex]
+                
+                isLive = self.isChannelLive(channel.name)
+                if not isLive: continue;
+                
                 # Get teams of player 
                 teams = self.api_get_json(f'https://www.checkmategaming.com/api/core/teamsForMember/{uuid}/null/null/null')
                 if (not teams): return;
@@ -78,13 +101,12 @@ class Bot(commands.Bot):
                             mode = teams['teams'][i]["isSingleType"] and "1v1" or "2v2" # Get match mode
                             self.partidas.append(matchId)
                             print("» New match «")
-                            # if self.matchesCount == 1: continue; # Not announce match on first iteration
+                            if self.matchesCount == 1: continue; # Not announce match on first iteration
                             matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
                             channel = self.connected_channels[channelIndex]
                             print(channel)
                             print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
                             await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                
         partidas.start(self)
 
 bot = Bot()
