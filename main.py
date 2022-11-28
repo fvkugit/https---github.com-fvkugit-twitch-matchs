@@ -6,12 +6,17 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
 
+
 class Bot(commands.Bot):
     def __init__(self):
         self.partidas = []
         self._uuidList = json.loads(os.environ.get("UUID"))
         self._channelList = json.loads(os.environ.get("CHANNEL"))
+        self.debugMode = int(os.environ.get('DEBUGMODE'))
         super().__init__(os.environ.get('TOKEN'), prefix='?', initial_channels=self._channelList)
+
+    def dprint(self, msg):
+        if self.debugMode: print("[ DEBUG ]", msg)
 
     def api_get_json(self, url):
         try:            
@@ -45,6 +50,7 @@ class Bot(commands.Bot):
         return matchData
 
     def isChannelLive(self, channel):
+        self.dprint(f"Checking {channel}'s channel'.")
         try:
             url = "https://api.twitch.tv/helix/streams"
             querystring = {"user_login":channel}
@@ -55,6 +61,7 @@ class Bot(commands.Bot):
             response = requests.request("GET", url, headers=headers, params=querystring)
             data = response.json()
             if (len(data['data']) == 0):
+                self.dprint(f"{channel} is offline, skiping.")
                 return False
             else:
                 return data['data'][0]['type'] == "live"
@@ -104,7 +111,7 @@ class Bot(commands.Bot):
                             if self.matchesCount == 1: continue; # Not announce match on first iteration
                             matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
                             channel = self.connected_channels[channelIndex]
-                            print(channel)
+                            print(f"Channel: {channel.name}")
                             print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
                             await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
