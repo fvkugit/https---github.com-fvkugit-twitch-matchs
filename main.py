@@ -115,9 +115,9 @@ class Bot(commands.Bot):
                             matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
                             channel = self.connected_channels[channelIndex]
                             print(f"Channel: {channel.name}")
-                            print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                            writeOnFile("log.txt", f"» {channel.name} « Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                            await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [Host {matchData['host']}] [{mode}] [BO{matchData['bo']}]  https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            writeOnFile("log.txt", f"» {channel.name} « Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [Host {matchData['host']}] [{mode}] [BO{matchData['bo']}]  https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [Host {matchData['host']}] [{mode}] [BO{matchData['bo']}]  https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
         
 bot = Bot()
