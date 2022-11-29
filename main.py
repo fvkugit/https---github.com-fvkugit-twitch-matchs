@@ -44,9 +44,12 @@ class Bot(commands.Bot):
         soup = BeautifulSoup(raw, 'html.parser')
         potRaw = soup.findAll("div", text=lambda x: x and x.startswith('$'))
         titleRaw = soup.find(class_="competition-name")
+        hostRaw = soup.find(class_="map-item")
         title = titleRaw.get_text()
+        host = hostRaw.get_text().split(":")[-1]
         matchData['pot'] = potRaw[0].get_text()
         matchData['bo'] = title.split()[-1]
+        matchData['host'] = " ".join(host.split())
         return matchData
 
     def isChannelLive(self, channel):
@@ -112,11 +115,11 @@ class Bot(commands.Bot):
                             matchData = self.getMatchData("https://www.checkmategaming.com/es" + match['match_url'])
                             channel = self.connected_channels[channelIndex]
                             print(f"Channel: {channel.name}")
-                            print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                            writeOnFile("log.txt", f"» {channel.name} « Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
-                            await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            print(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            writeOnFile("log.txt", f"» {channel.name} « Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
+                            await channel.send(f"Nueva partida contra {match['opponent_team_name']} por {matchData['pot']} de POT [{mode}] [BO{matchData['bo']}] [Host {matchData['host']}] https://www.checkmategaming.com/es/matchfinder-ladder-500-challenge-{matchId}-match-details")
         partidas.start(self)
-
+        
 bot = Bot()
 bot.run()
 
