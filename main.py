@@ -90,7 +90,6 @@ class Bot(commands.Bot):
         index = self._channelList.index(channel)
         uuid = self._uuidList[index]
         pTeams = []
-        print(game)
         # Get teams of player 
         teams = self.api_get_json(f'https://www.checkmategaming.com/api/core/teamsForMember/{uuid}/null/null/null')
         if (not teams): return;
