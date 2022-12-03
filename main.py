@@ -13,6 +13,8 @@ class Bot(commands.Bot):
         self._uuidList = json.loads(os.environ.get("UUID"))
         self._channelList = json.loads(os.environ.get("CHANNEL"))
         self.debugMode = int(os.environ.get('DEBUGMODE'))
+        langRaw = open(f"{os.environ.get('LANGFILE')}.json", 'r', encoding='utf-8')
+        self.lang = json.load(langRaw)
         super().__init__(os.environ.get('TOKEN'), prefix='?', initial_channels=self._channelList)
 
     def dprint(self, msg):
@@ -52,6 +54,13 @@ class Bot(commands.Bot):
         matchData['host'] = " ".join(host.split())
         return matchData
 
+    def getTeamTop(self, url):
+        raw = self.api_get_text(url)
+        if not raw: return
+        soup = BeautifulSoup(raw, 'html.parser')
+        rankRaw = soup.find("h3")
+        return rankRaw.get_text()
+
     def isChannelLive(self, channel):
         self.dprint(f"Checking {channel}'s channel'.")
         try:
@@ -71,6 +80,39 @@ class Bot(commands.Bot):
         except Exception as e:
             writeOnFile("log.txt", e)
             return False
+
+    def getTeamsStats(self, channel, game):
+        game = game.lower()
+        games = {"wz2": "Warzone 2", "wz": "Modern Warfare: Warzone"}
+        if not game in games: return "Sos boludo? wz o wz2?";
+        mTeams = (f"[ Teams {game} ] - ")
+        game = games[game]
+        index = self._channelList.index(channel)
+        uuid = self._uuidList[index]
+        pTeams = []
+        print(game)
+        # Get teams of player 
+        teams = self.api_get_json(f'https://www.checkmategaming.com/api/core/teamsForMember/{uuid}/null/null/null')
+        if (not teams): return;
+
+        for i in range(len(teams['teams'])):
+            cTeam = teams['teams'][i]
+            if cTeam['group']['name'] != game: continue;
+            name = cTeam['name']
+            wins = cTeam['records']['wins']
+            losses = cTeam['records']['losses']
+            tUrl = (f"https://www.checkmategaming.com/es{cTeam['teamDetailsPath']}")
+            top = self.getTeamTop(tUrl).strip()
+            mTeams += (f" {self.lang['leaderboard']['top'].format(teamName = name, teamWins = wins, teamLosses = losses, teamRank = top).replace(' ','⠀')} ⠀")
+            
+        return mTeams
+        
+
+    @commands.command()
+    async def teams(self, ctx: commands.Context, game):
+        channel = ctx.channel.name
+        result = self.getTeamsStats(channel, game)
+        await ctx.send(f"{ctx.author.name} - {result}")
 
 
     async def event_ready(self):
