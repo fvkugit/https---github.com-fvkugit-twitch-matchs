@@ -1,0 +1,10 @@
+{
+    "profit":{
+        "restart": "El profit fue reiniciado.",
+        "set": "El profit fue fijado en {profitNewValue}",
+        "view": "Profit de hoy: {profitValue}"
+    },
+    "leaderboard":{
+        "top": "[ {teamName} {teamRank}🏆 ({teamWins}-{teamLosses}) ]"
+    }
+}
